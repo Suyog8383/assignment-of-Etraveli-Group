@@ -1,10 +1,18 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AddMovie } from "./HomeReducer";
 
 function HomeLayout() {
   const [movies, setMovies] = useState([]);
   const [filter, setFilter] = useState("");
-  const [selectedMovie, setSelectedMovie] = useState([]);
+
+  const { selectedMovie, isFetching } = useSelector((state) => state.movies);
+  const dispatch = useDispatch();
+
+  const handleOnclick = (item) => {
+    dispatch(AddMovie(item));
+  };
 
   useEffect(() => {
     axios
@@ -42,15 +50,9 @@ function HomeLayout() {
     return romanNumeral;
   }
 
-  function handleOnclick(item) {
-    setSelectedMovie((prevState) => {
-      return [...prevState, item];
-    });
-  }
-  console.log("@SN ", selectedMovie);
   return (
     <div>
-      <div className="input-group mb-3">
+      <div className="input-group mb-3" style={{ padding: "10px 0 0 10px" }}>
         <div className="input-group-prepend">
           <button
             className="btn btn-outline-secondary dropdown-toggle"
@@ -70,35 +72,64 @@ function HomeLayout() {
             </a>
           </div>
         </div>
-        <input
-          value={filter}
-          type="text"
-          className="form-control"
-          placeholder="Type to search..."
-          aria-label="Text input with dropdown button"
-          onChange={(e) => setFilter(e.target.value)}
-        />
+        <div style={{ display: "flex" }}>
+          <input
+            value={filter}
+            type="text"
+            className="form-control"
+            placeholder="Type to search..."
+            aria-label="Text input with dropdown button"
+            onChange={(e) => setFilter(e.target.value)}
+            style={{ width: "650px" }}
+          />
+        </div>
       </div>
 
-      <table class="table" style={{ width: "50%" }}>
-        <tbody>
-          {filteredFilms.map((item, index) => {
-            return (
-              <tr key={index}>
-                <td>EPISODE {item.episode_id}</td>
-                <td onClick={() => handleOnclick(item)}>
-                  Episode {convertToRomanNumeral(item.episode_id)} -{" "}
-                  {item.title}
-                </td>
-                <td>{item.release_date}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      {selectedMovie.map((item) => {
-        return <p>{item.title}</p>;
-      })}
+      <div style={{ display: "flex" }}>
+        <table className="table" style={{ width: "50%" }}>
+          <tbody>
+            {filteredFilms.map((item, index) => {
+              return (
+                <tr key={index}>
+                  <td>EPISODE {item.episode_id}</td>
+                  <td onClick={() => handleOnclick(item)}>
+                    Episode {convertToRomanNumeral(item.episode_id)} -{" "}
+                    {item.title}
+                  </td>
+                  <td>{item.release_date}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <div style={{ width: "50%", padding: "0 30px", cursor: "pointer" }}>
+          {isFetching ? (
+            <>
+              <div>
+                <h3>
+                  {" "}
+                  Episode {convertToRomanNumeral(
+                    selectedMovie.episode_id
+                  )} - {selectedMovie.title}
+                </h3>
+                <p>{selectedMovie.opening_crawl}</p>
+                <br />
+                <p>Directed by : {selectedMovie.director}</p>
+              </div>
+            </>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <h4>No movie selected</h4>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
