@@ -20,9 +20,22 @@ function HomeLayout() {
       .then((data) => setMovies(data.data.results));
   }, []);
 
+  const [filterParam, setFilterParam] = useState([]);
+
   const filteredFilms = movies.filter((film) => {
+    if (filterParam === "title") {
+      return film.title.toLowerCase().includes(filter.toLowerCase());
+    } else if (filterParam === "episode_id") {
+      return film.episode_id
+        .toString()
+        .toLowerCase()
+        .includes(filter.toLowerCase());
+    } else if (filterParam === "release_date") {
+      return film.release_date.toLowerCase().includes(filter.toLowerCase());
+    }
     return film.title.toLowerCase().includes(filter.toLowerCase());
   });
+
   function convertToRomanNumeral(episodeNumber) {
     const romanNumerals = [
       { value: 1000, numeral: "M" },
@@ -54,23 +67,11 @@ function HomeLayout() {
     <div>
       <div className="input-group mb-3" style={{ padding: "10px 0 0 10px" }}>
         <div className="input-group-prepend">
-          <button
-            className="btn btn-outline-secondary dropdown-toggle"
-            type="button"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            Sort by...
-          </button>
-          <div className="dropdown-menu">
-            <a className="dropdown-item" href="#">
-              Episodes
-            </a>
-            <a className="dropdown-item" href="#">
-              Year
-            </a>
-          </div>
+          <select name="" id="" onClick={(e) => setFilterParam(e.target.value)}>
+            <option value="title">name</option>
+            <option value="episode_id">episode</option>
+            <option value="release_date">date</option>
+          </select>
         </div>
         <div style={{ display: "flex" }}>
           <input
